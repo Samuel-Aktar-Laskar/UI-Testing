@@ -1,9 +1,12 @@
 document.getElementById('start').addEventListener('click', () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.runtime.sendMessage({ action: "startRecording" }, (response) => {
-        console.log(response.status);
-      });
-    });
+    chrome.storage.local.set({activities:[]},()=>{
+
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.runtime.sendMessage({ action: "startRecording" }, (response) => {
+            console.log(response.status);
+          });
+        });
+    })
   });
   
   document.getElementById('stop').addEventListener('click', () => {
@@ -12,3 +15,8 @@ document.getElementById('start').addEventListener('click', () => {
     });
   });
   
+  document.getElementById('simulate').addEventListener('click',()=>{
+    chrome.storage.local.set({curIndex:0},()=>{
+        console.log("Recording set")
+    })
+  })

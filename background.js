@@ -42,20 +42,18 @@ function filterData(){
   chrome.storage.local.get({activities:[]}, (result)=>{
       
       const activities = result.activities.map((item)=> JSON.parse(item))
-      console.log(activities)
       const parsedActivities = []
       let lastActivity = null
       let pervIsClick = false
       activities.forEach(activity=> {
         if (activity.type == 'click'){
-          if (!pervIsClick){
+          if (!pervIsClick && lastActivity != null){
             parsedActivities.push(lastActivity)
           }
           pervIsClick = true
-
           parsedActivities.push(activity)
         } 
-        else {
+        else if (activity.type == 'scroll') {
           if (pervIsClick){
             parsedActivities.push(activity)
           } 
@@ -63,6 +61,7 @@ function filterData(){
           lastActivity = activity
         }
       });
-      chrome.storage.local.set({activities:parsedActivities})
+      chrome.storage.local.set({activities:parsedActivities},()=>{})
+      console.log(parsedActivities)
   })
 }
