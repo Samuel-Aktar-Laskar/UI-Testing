@@ -88,20 +88,29 @@ function filterData() {
       }
       parsedActivities.push(activity);
     } else if (activity.type == "scroll") {
+      if (lastActivity != null && lastActivity.type != "scroll" && lastActivity.type != 'assert') {
+        parsedActivities.push(activity);
+      }
+    }
+    
+    else if (activity.type == 'assert'){
       if (lastActivity != null && lastActivity.type != "scroll") {
         parsedActivities.push(activity);
       }
-    } else if (activity.type == "typing") {
+      parsedActivities.push(activity)
+    }
+    else if (activity.type == "typing") {
+
       if (lastActivity != null && lastActivity.type == "scroll") {
         parsedActivities.push(lastActivity);
       }
-      if (lastActivity == null || lastActivity.type != 'typing') parsedActivities.push(activity);
+      if (lastActivity == null || lastActivity.type != "typing")
+        parsedActivities.push(activity);
       else {
-        if (lastActivity.xPath == activity.xPath){
-          parsedActivities[parsedActivities.length-1].text = activity.text
-        }
-        else {
-          parsedActivities.push(activity)
+        if (lastActivity.xPath == activity.xPath) {
+          parsedActivities[parsedActivities.length - 1].text = activity.text;
+        } else {
+          parsedActivities.push(activity);
         }
       }
     }

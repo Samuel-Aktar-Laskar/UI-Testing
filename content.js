@@ -1,6 +1,8 @@
 
 console.log("content script loaded")
 
+let addingAssert = false
+
 function startRecording() {
   injectPipWindow()
   document.addEventListener("click", recordClick);
@@ -34,11 +36,12 @@ function recordTyping(event){
 function recordClick(event) {
   const element = event.target
   const activity = {
-    type: "click",
+    type: addingAssert ? "assert":"click",
     x: event.clientX,
     y: event.clientY,
     xPath:getXPath(element)
   };
+  addingAssert = false
 
   if (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase()==='textarea'){
     console.log('Input box is selected')
@@ -287,7 +290,7 @@ function injectPipWindow(){
     // Add event listeners for the buttons
  
     document.getElementById('button2').addEventListener('click', () => {
-      alert('Button 2 clicked');
+      addingAssert = true
     });
 
     document.getElementById('button3').addEventListener('click', () => {
