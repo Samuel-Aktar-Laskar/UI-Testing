@@ -1,12 +1,15 @@
-console.log("Hi, I am recordingTabRunner")
 
-function sayHello(){
-    console.log("Hello World")
-}
 
 let runningTabId = -1
 
-const activities = []
+let activities = [
+    {
+        type:'scroll',
+        scrollTop:5000,
+        scrollLeft:0,
+    }
+]
+let rUrl = 'https://www.wikipedia.org/'
 
 function openNewTab(url) {
     return new Promise((resolve, reject) => {
@@ -22,7 +25,7 @@ function openNewTab(url) {
 
 async function startRecording(url){
     try {
-
+        rUrl = url
         while(activities.length){
             activities.pop()
         }
@@ -44,6 +47,7 @@ async function stopRecording(){
             throw Error("tabId is -1")
         }
         closeTab(tabId)
+        filterData()
     }
     catch (e){
         console.log("Error :", e.message)
@@ -81,3 +85,27 @@ function closeTab(tabId) {
     });
   }
   
+  function filterData(){
+        
+        const parsedActivities = []
+        let lastActivity = null
+        let pervIsClick = false
+        activities.forEach(activity=> {
+          if (activity.type == 'click'){
+            if (!pervIsClick && lastActivity != null){
+              parsedActivities.push(lastActivity)
+            }
+            pervIsClick = true
+            parsedActivities.push(activity)
+          } 
+          else if (activity.type == 'scroll') {
+            if (pervIsClick){
+              parsedActivities.push(activity)
+            } 
+            pervIsClick = false
+            lastActivity = activity
+          }
+        });
+        activities = parsedActivities
+        console.log(parsedActivities)
+  }

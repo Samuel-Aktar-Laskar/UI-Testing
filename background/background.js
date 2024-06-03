@@ -1,9 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.set({ recording: false });
-  sayHello()
 });
 
-console.log("Hi I am attached")
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -23,7 +21,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   else if (message.action === "stopRecording") {
     chrome.storage.local.set({ recording: false }, () => {
       sendResponse({ status: "Recording stopped" });
-      filterData()
     });
   }
   
@@ -42,30 +39,30 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
-function filterData(){
-  chrome.storage.local.get({activities:[]}, (result)=>{
+// function filterData(){
+//   chrome.storage.local.get({activities:[]}, (result)=>{
       
-      const activities = result.activities.map((item)=> JSON.parse(item))
-      const parsedActivities = []
-      let lastActivity = null
-      let pervIsClick = false
-      activities.forEach(activity=> {
-        if (activity.type == 'click'){
-          if (!pervIsClick && lastActivity != null){
-            parsedActivities.push(lastActivity)
-          }
-          pervIsClick = true
-          parsedActivities.push(activity)
-        } 
-        else if (activity.type == 'scroll') {
-          if (pervIsClick){
-            parsedActivities.push(activity)
-          } 
-          pervIsClick = false
-          lastActivity = activity
-        }
-      });
-      chrome.storage.local.set({activities:parsedActivities},()=>{})
-      console.log(parsedActivities)
-  })
-}
+//       const activities = result.activities.map((item)=> JSON.parse(item))
+//       const parsedActivities = []
+//       let lastActivity = null
+//       let pervIsClick = false
+//       activities.forEach(activity=> {
+//         if (activity.type == 'click'){
+//           if (!pervIsClick && lastActivity != null){
+//             parsedActivities.push(lastActivity)
+//           }
+//           pervIsClick = true
+//           parsedActivities.push(activity)
+//         } 
+//         else if (activity.type == 'scroll') {
+//           if (pervIsClick){
+//             parsedActivities.push(activity)
+//           } 
+//           pervIsClick = false
+//           lastActivity = activity
+//         }
+//       });
+//       chrome.storage.local.set({activities:parsedActivities},()=>{})
+//       console.log(parsedActivities)
+//   })
+// }

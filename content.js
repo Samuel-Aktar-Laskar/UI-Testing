@@ -12,6 +12,8 @@
 //   }
 // });
 
+console.log("content script loaded")
+
 chrome.storage.local.get("curIndex", (result)=>{
     if (result.curIndex != -1){
         const cIndex = result.curIndex
@@ -67,7 +69,7 @@ function recordScroll(event) {
   });
 }
 
-chrome.storage.onChanged.addListener(async (changes, areaName) => {
+// chrome.storage.onChanged.addListener(async (changes, areaName) => {
   // if (areaName === "local" && changes.recording) {
   //   if (changes.recording.newValue) {
   //     startRecording();
@@ -76,23 +78,23 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
   //   }
   // }
 
-  if (areaName === "local" && changes.curIndex) {
-    const cIndex = changes.curIndex.newValue;
-    console.log("cIndex", cIndex)
-    if (cIndex != -1) {
-      chrome.storage.local.get({ activities: [] },async (result) => {
-        console.log("Activities ", result.activities)
-        const activity = result.activities.at(cIndex)
-        if (activity == null){
-            console.log("Activity is null")
-            chrome.storage.local.set({curIndex:-1})
-            return
-        }
-        executeActivity(result.activities[cIndex], cIndex, result.activities.length);
-      });
-    }
-  }
-});
+//   if (areaName === "local" && changes.curIndex) {
+//     const cIndex = changes.curIndex.newValue;
+//     console.log("cIndex", cIndex)
+//     if (cIndex != -1) {
+//       chrome.storage.local.get({ activities: [] },async (result) => {
+//         console.log("Activities ", result.activities)
+//         const activity = result.activities.at(cIndex)
+//         if (activity == null){
+//             console.log("Activity is null")
+//             chrome.storage.local.set({curIndex:-1})
+//             return
+//         }
+//         executeActivity(result.activities[cIndex], cIndex, result.activities.length);
+//       });
+//     }
+//   }
+// });
 
 async function simulateClick(x, y) {
     console.log("click at ", x , y)
@@ -150,17 +152,17 @@ function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function executeActivity(activity, curIndex, actLength) {
+async function executeActivity(activity) {
   // Execute activity based on type (e.g., click or scroll)
-  console.log("Execute ",activity, curIndex,actLength)
+  console.log("Execute ",activity)
   if (activity.type === "click") {
     await simulateClick(activity.x, activity.y);
   } else if (activity.type === "scroll") {
     await simulateScroll(activity.scrollLeft, activity.scrollTop);
   }
-  // Update curIndex in storage
-  curIndex = curIndex+1
-  chrome.storage.local.set({ curIndex: curIndex < actLength ? curIndex : -1});
+  // // Update curIndex in storage
+  // curIndex = curIndex+1
+  // chrome.storage.local.set({ curIndex: curIndex < actLength ? curIndex : -1});
 }
 
 
@@ -189,9 +191,14 @@ window.addEventListener('message', (event) => {
 
 //Tells the content script what to do now
 function startAction(){
-  chrome.runtime.sendMessage({type:"action"}, result=>{
+  chrome.runtime.sendMessage({type:"action"}, async result=>{
+    console.log("Action result is ", result)
     if (result.record){
       startRecording()
+    }
+    else if (result.replay){
+      await executeActivity(result.activity)
+      startAction()
     }
     
   })
