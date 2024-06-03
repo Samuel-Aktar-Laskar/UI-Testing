@@ -24,26 +24,28 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
     else if (message.type === 'action'){
         if (recording){
-            sendResponse({record: true})
+            sendResponse({action: 'record'})
         }
         else if (replaying){
             //replay
             const res = await continuePlay()
             if (!res.complete){
                 console.log("to paly activity :", res.activity)
-                sendResponse({replay:true, activity:res.activity})
+                sendResponse({action:'replay', activity:res.activity})
             }
             else {
+                sendResponse({action:'close'})
                 closeTab(replayTabId)
                 console.log("Complete")
             }
             //if complete, close it
         }
         else 
-            sendResponse({record:false})
+            sendResponse({action:'nothing'})
     }
     else if (message.action === 'logActivity'){
         console.log("Received in monitor", message.activity, typeof message.activity)
         appendActivity(JSON.parse(message.activity))
     }
+    return true
   });

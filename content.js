@@ -1,16 +1,3 @@
-// let currentTabId = -1
-// console.log("content script loaded")
-// chrome.storage.local.get("recording", async (result) => {
-//   console.log("local storage result ", result)
-//   try {
-//     currentTabId = await getCurrentTabId()
-//     if (result.recording == currentTabId){
-//       startRecording()
-//     }
-//   } catch (error) {
-//       console.log("Error ", error) 
-//   }
-// });
 
 console.log("content script loaded")
 
@@ -69,32 +56,6 @@ function recordScroll(event) {
   });
 }
 
-// chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  // if (areaName === "local" && changes.recording) {
-  //   if (changes.recording.newValue) {
-  //     startRecording();
-  //   } else {
-  //     stopRecording();
-  //   }
-  // }
-
-//   if (areaName === "local" && changes.curIndex) {
-//     const cIndex = changes.curIndex.newValue;
-//     console.log("cIndex", cIndex)
-//     if (cIndex != -1) {
-//       chrome.storage.local.get({ activities: [] },async (result) => {
-//         console.log("Activities ", result.activities)
-//         const activity = result.activities.at(cIndex)
-//         if (activity == null){
-//             console.log("Activity is null")
-//             chrome.storage.local.set({curIndex:-1})
-//             return
-//         }
-//         executeActivity(result.activities[cIndex], cIndex, result.activities.length);
-//       });
-//     }
-//   }
-// });
 
 async function simulateClick(x, y) {
     console.log("click at ", x , y)
@@ -160,19 +121,8 @@ async function executeActivity(activity) {
   } else if (activity.type === "scroll") {
     await simulateScroll(activity.scrollLeft, activity.scrollTop);
   }
-  // // Update curIndex in storage
-  // curIndex = curIndex+1
-  // chrome.storage.local.set({ curIndex: curIndex < actLength ? curIndex : -1});
 }
 
-
-// chrome.runtime.onMessage.addListener(
-//   (message,sender, sendResponse)=>{
-//     if (message.action === 'start_recording'){
-//       console.log("Start recording message received in content.js")
-//     }
-//   }
-// )
 
 
 // Listen for messages from the web page
@@ -193,10 +143,10 @@ window.addEventListener('message', (event) => {
 function startAction(){
   chrome.runtime.sendMessage({type:"action"}, async result=>{
     console.log("Action result is ", result)
-    if (result.record){
+    if (result.action === 'record'){
       startRecording()
     }
-    else if (result.replay){
+    else if (result.action === 'replay'){
       await executeActivity(result.activity)
       startAction()
     }
