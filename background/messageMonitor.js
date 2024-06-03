@@ -15,7 +15,16 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     else if (message.type === 'stop_recording'){
         recording = false
         stopRecording();
-        sendResponse({successful:true})
+        await wait(200)
+        sendResponse({successful:true,activities:activities})
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0) {
+              const activeTab = tabs[0].id;
+              chrome.tabs.sendMessage(activeTab, { type: 'FROM_EXTENSION', activities:activities }, (response) => {
+                console.log('Response from content script:', response);
+              });
+            }
+          });
     }
     else if (message.type === 'start_replaying'){
         replaying = true

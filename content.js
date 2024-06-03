@@ -176,6 +176,13 @@ window.addEventListener('message', (event) => {
   }
 }, false);
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'FROM_EXTENSION') {
+    // Forward the message to the web page
+    console.log("Forwarding message from content script")
+    window.postMessage({ type: 'FROM_EXTENSION', activities: message.activities }, '*');
+  }
+});
 
 
 //Tells the content script what to do now
@@ -193,6 +200,8 @@ function startAction(){
   })
 }
 startAction()
+
+
 
 
 
@@ -282,7 +291,8 @@ function injectPipWindow(){
     });
 
     document.getElementById('button3').addEventListener('click', () => {
-      chrome.runtime.sendMessage({type:'stop_recording'})
+      chrome.runtime.sendMessage({type:'stop_recording'},result=>{
+      })
     });
 
    
