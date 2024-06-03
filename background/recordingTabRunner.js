@@ -81,41 +81,63 @@ function closeTab(tabId) {
 function filterData() {
   const parsedActivities = [];
   let lastActivity = null;
-  activities.forEach((activity) => {
-    if (activity.type == "click") {
-      if (lastActivity != null && lastActivity.type == "scroll") {
-        parsedActivities.push(lastActivity);
-      }
-      parsedActivities.push(activity);
-    } else if (activity.type == "scroll") {
-      if (lastActivity != null && lastActivity.type != "scroll" && lastActivity.type != 'assert') {
-        parsedActivities.push(activity);
-      }
-    }
-    
-    else if (activity.type == 'assert'){
-      if (lastActivity != null && lastActivity.type != "scroll") {
-        parsedActivities.push(activity);
-      }
-      parsedActivities.push(activity)
-    }
-    else if (activity.type == "typing") {
 
-      if (lastActivity != null && lastActivity.type == "scroll") {
-        parsedActivities.push(lastActivity);
-      }
-      if (lastActivity == null || lastActivity.type != "typing")
-        parsedActivities.push(activity);
-      else {
-        if (lastActivity.xPath == activity.xPath) {
-          parsedActivities[parsedActivities.length - 1].text = activity.text;
-        } else {
-          parsedActivities.push(activity);
-        }
-      }
+  for(let i=0;i<activities.length;i++){
+    const activity = activities[i]
+
+    if (activity.type == 'click' && activity.xPath == "//*[@id='button3']") continue
+
+    if (activity.type == 'scroll')
+      continue
+
+    if (i>0 && activities[i-1].type == 'scroll'){
+      parsedActivities.push(activities[i-1])
     }
-    lastActivity = activity;
-  });
+
+    if (activity.type == 'typing') 
+      continue
+
+    if (i>0 && activities[i-1].type == 'typing'){
+      parsedActivities.push(activities[i-1])
+    }
+
+    parsedActivities.push(activity)
+  }
+  // activities.forEach((activity) => {
+  //   if (activity.type == "click") {
+  //     if (lastActivity != null && lastActivity.type == "scroll") {
+  //       parsedActivities.push(lastActivity);
+  //     }
+  //     parsedActivities.push(activity);
+  //   } else if (activity.type == "scroll") {
+  //     if (lastActivity != null && lastActivity.type != "scroll" && lastActivity.type != 'assert') {
+  //       parsedActivities.push(activity);
+  //     }
+  //   }
+    
+  //   else if (activity.type == 'assert'){
+  //     if (lastActivity != null && lastActivity.type != "scroll") {
+  //       parsedActivities.push(activity);
+  //     }
+  //     parsedActivities.push(activity)
+  //   }
+  //   else if (activity.type == "typing") {
+
+  //     if (lastActivity != null && lastActivity.type == "scroll") {
+  //       parsedActivities.push(lastActivity);
+  //     }
+  //     if (lastActivity == null || lastActivity.type != "typing")
+  //       parsedActivities.push(activity);
+  //     else {
+  //       if (lastActivity.xPath == activity.xPath) {
+  //         parsedActivities[parsedActivities.length - 1].text = activity.text;
+  //       } else {
+  //         parsedActivities.push(activity);
+  //       }
+  //     }
+  //   }
+  //   lastActivity = activity;
+  // });
   console.log("Before parsing ", activities);
   activities = parsedActivities;
   console.log(parsedActivities);
