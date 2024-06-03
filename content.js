@@ -14,13 +14,38 @@ function stopRecording() {
   console.log("Stopped recording");
 }
 
+function recordTyping(event){
+  const element = event.target
+  console.log('User typed ', element.value)
+  const xPath = getXPath(element)
+  const activity = {
+     type:'typing',
+     xPath:xPath, 
+     text: element.value
+  }
+  const serializedActivity = JSON.stringify(activity)
+  chrome.runtime.sendMessage({
+    action:'logActivity',
+    activity: serializedActivity
+  })
+
+}
+
 function recordClick(event) {
+  const element = event.target
   const activity = {
     type: "click",
     x: event.clientX,
     y: event.clientY,
-    xPath:getXPath(event.target)
+    xPath:getXPath(element)
   };
+
+  if (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase()==='textarea'){
+    console.log('Input box is selected')
+    element.addEventListener('input',recordTyping)
+  }
+
+
   console.log('XPath got is ', activity.xPath)
   const serializedActivity = JSON.stringify(activity);
   chrome.runtime.sendMessage({
@@ -59,7 +84,7 @@ async function clickElementByXPath(xpath) {
       // Programmatically click the element
       element.click();
       console.log('Element clicked:', element);
-      await wait(3000)
+      await wait(2500)
     } else {
       console.error('Element not found for the given XPath:', xpath);
     }
@@ -94,8 +119,32 @@ function smoothScrollTo(scrollLeft, scrollTop, duration) {
 async function simulateScroll(scrollLeft, scrollTop) {
     console.log("Simulating Scroll", scrollTop)
 //   window.scrollTo(scrollLeft, scrollTop);
-smoothScrollTo(scrollLeft,scrollTop,1000)
-  await wait(1300); // Adjust wait time as needed
+  smoothScrollTo(scrollLeft,scrollTop,1000)
+  await wait(900); // Adjust wait time as needed
+}
+
+async function simulateTyping(xpath, text) {
+  const element = document.evaluate(
+    xpath,
+    document,
+    null,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null
+  ).singleNodeValue;
+
+  if (element) {
+    if (element.tagName.toLowerCase() === 'input' || element.tagName.toLowerCase() === 'textarea') {
+      // For input and textarea elements
+      element.value = text;
+    } else {
+      // For other elements
+      element.textContent = text;
+    }
+    console.log('Text set for element:', element);
+    await wait(500)
+  } else {
+    console.error('Element not found for the given XPath:', xpath);
+  }
 }
 
 
@@ -107,6 +156,9 @@ async function executeActivity(activity) {
     await clickElementByXPath(activity.xPath)
   } else if (activity.type === "scroll") {
     await simulateScroll(activity.scrollLeft, activity.scrollTop);
+  }
+  else if (activity.type === 'typing'){
+    await simulateTyping(activity.xPath,activity.text)
   }
 }
 
@@ -230,7 +282,6 @@ function injectPipWindow(){
     });
 
     document.getElementById('button3').addEventListener('click', () => {
-      alert('Button 3 clicked');
       chrome.runtime.sendMessage({type:'stop_recording'})
     });
 
