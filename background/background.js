@@ -1,6 +1,10 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.set({ recording: false });
+  sayHello()
 });
+
+console.log("Hi I am attached")
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
@@ -25,7 +29,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   
   
   else if (message.action === "logActivity") {
-    console.log("Received activity", message.activity, typeof message.activity)
+    // console.log("Received activity", message.activity, typeof message.activity)
     chrome.storage.local.get({ activities: [] }, (result) => {
       const activities = result.activities;
       activities.push(message.activity);

@@ -1,8 +1,16 @@
-chrome.storage.local.get("recording", (result) => {
-  if (result.recording) {
-    startRecording();
-  }
-});
+// let currentTabId = -1
+// console.log("content script loaded")
+// chrome.storage.local.get("recording", async (result) => {
+//   console.log("local storage result ", result)
+//   try {
+//     currentTabId = await getCurrentTabId()
+//     if (result.recording == currentTabId){
+//       startRecording()
+//     }
+//   } catch (error) {
+//       console.log("Error ", error) 
+//   }
+// });
 
 chrome.storage.local.get("curIndex", (result)=>{
     if (result.curIndex != -1){
@@ -60,13 +68,13 @@ function recordScroll(event) {
 }
 
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === "local" && changes.recording) {
-    if (changes.recording.newValue) {
-      startRecording();
-    } else {
-      stopRecording();
-    }
-  }
+  // if (areaName === "local" && changes.recording) {
+  //   if (changes.recording.newValue) {
+  //     startRecording();
+  //   } else {
+  //     stopRecording();
+  //   }
+  // }
 
   if (areaName === "local" && changes.curIndex) {
     const cIndex = changes.curIndex.newValue;
@@ -154,3 +162,38 @@ async function executeActivity(activity, curIndex, actLength) {
   curIndex = curIndex+1
   chrome.storage.local.set({ curIndex: curIndex < actLength ? curIndex : -1});
 }
+
+
+// chrome.runtime.onMessage.addListener(
+//   (message,sender, sendResponse)=>{
+//     if (message.action === 'start_recording'){
+//       console.log("Start recording message received in content.js")
+//     }
+//   }
+// )
+
+
+// Listen for messages from the web page
+window.addEventListener('message', (event) => {
+  // We only accept messages from ourselves
+  if (event.source !== window) return;
+
+  if (event.data && event.data.type === 'FROM_PAGE') {
+    chrome.runtime.sendMessage(event.data.payload, (response) => {
+      console.log('Response from background:', response);
+    });
+  }
+}, false);
+
+
+
+//Tells the content script what to do now
+function startAction(){
+  chrome.runtime.sendMessage({type:"action"}, result=>{
+    if (result.record){
+      startRecording()
+    }
+    
+  })
+}
+startAction()

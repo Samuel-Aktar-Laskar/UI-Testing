@@ -1,15 +1,22 @@
 {
-    "manifest_version":3,
+    "manifest_version":2,
     "name":"Activity Recorder",
     "version":"1.0",
     "description":"Automates UI testing",
     "permissions": [
         "storage",
         "activeTab",
-        "scripting"
+        "scripting",
+        "tabs",
+        "webNavigation"
       ],
       "background": {
-        "service_worker": "background.js"
+        "scripts":[
+          "background/background.js",
+          "background/recordingTabRunner.js",
+          "background/replayTabRunner.js",
+          "background/messageMonitor.js"
+        ]
       },
       "content_scripts": [
         {
