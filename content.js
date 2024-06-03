@@ -43,25 +43,28 @@ function recordScroll(event) {
 }
 
 
-async function simulateClick(x, y) {
-    console.log("click at ", x , y)
-    const event = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-      clientX: x,
-      clientY: y
-    });
-  
-    const element = document.elementFromPoint(x, y);
+
+async function clickElementByXPath(xpath) {
+    // Locate the element using XPath
+    const element = document.evaluate(
+      xpath,
+      document,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null
+    ).singleNodeValue;
+
+    // Check if the element exists
     if (element) {
-      element.dispatchEvent(event);
-      console.log('Click simulated at coordinates:', x, y);
+      // Programmatically click the element
+      element.click();
+      console.log('Element clicked:', element);
+      await wait(3000)
     } else {
-      console.warn('No element found at coordinates:', x, y);
+      console.error('Element not found for the given XPath:', xpath);
     }
-    await wait(3000)
 }
+
 
 function smoothScrollTo(scrollLeft, scrollTop, duration) {
     const startLeft = window.scrollX || window.pageXOffset;
@@ -100,7 +103,8 @@ async function executeActivity(activity) {
   // Execute activity based on type (e.g., click or scroll)
   console.log("Execute ",activity)
   if (activity.type === "click") {
-    await simulateClick(activity.x, activity.y);
+    // await simulateClick(activity.x, activity.y);
+    await clickElementByXPath(activity.xPath)
   } else if (activity.type === "scroll") {
     await simulateScroll(activity.scrollLeft, activity.scrollTop);
   }
