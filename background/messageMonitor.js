@@ -14,6 +14,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
     else if (message.type === 'stop_recording'){
         recording = false
+        await wait(200)
         stopRecording();
         await wait(200)
         sendResponse({successful:true,activities:activities})
@@ -54,7 +55,13 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
     else if (message.action === 'logActivity'){
         console.log("Received in monitor", message.activity, typeof message.activity)
-        appendActivity(JSON.parse(message.activity))
+        const activity = JSON.parse(message.activity)
+        if ('boundingRect' in activity){
+            //in background.js
+            const res = await captureBoundingRect(activity.boundingRect)
+            activity.screenshot = res.screenshot 
+        }
+        appendActivity(activity)
     }
     return true
   });

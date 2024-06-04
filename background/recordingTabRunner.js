@@ -80,13 +80,9 @@ function closeTab(tabId) {
 
 function filterData() {
   const parsedActivities = [];
-  let lastActivity = null;
 
   for(let i=0;i<activities.length;i++){
     const activity = activities[i]
-
-    if (activity.type == 'click' && activity.xPath == "//*[@id='button3']") continue
-
     if (activity.type == 'scroll')
       continue
 
@@ -101,43 +97,17 @@ function filterData() {
       parsedActivities.push(activities[i-1])
     }
 
+    if ('xPath' in activity && activity.xPath === "//*[@id='button2']") continue
+    if ('xPath' in activity && activity.xPath === "//*[@id='button3']") continue
+
     parsedActivities.push(activity)
   }
-  // activities.forEach((activity) => {
-  //   if (activity.type == "click") {
-  //     if (lastActivity != null && lastActivity.type == "scroll") {
-  //       parsedActivities.push(lastActivity);
-  //     }
-  //     parsedActivities.push(activity);
-  //   } else if (activity.type == "scroll") {
-  //     if (lastActivity != null && lastActivity.type != "scroll" && lastActivity.type != 'assert') {
-  //       parsedActivities.push(activity);
-  //     }
-  //   }
-    
-  //   else if (activity.type == 'assert'){
-  //     if (lastActivity != null && lastActivity.type != "scroll") {
-  //       parsedActivities.push(activity);
-  //     }
-  //     parsedActivities.push(activity)
-  //   }
-  //   else if (activity.type == "typing") {
-
-  //     if (lastActivity != null && lastActivity.type == "scroll") {
-  //       parsedActivities.push(lastActivity);
-  //     }
-  //     if (lastActivity == null || lastActivity.type != "typing")
-  //       parsedActivities.push(activity);
-  //     else {
-  //       if (lastActivity.xPath == activity.xPath) {
-  //         parsedActivities[parsedActivities.length - 1].text = activity.text;
-  //       } else {
-  //         parsedActivities.push(activity);
-  //       }
-  //     }
-  //   }
-  //   lastActivity = activity;
-  // });
+  if (activities.length){
+    const lastActivity = activities[activities.length -1]
+    if (lastActivity.type === 'scroll' || lastActivity.type === 'typing'){
+      parsedActivities.push(lastActivity)
+    }
+  }
   console.log("Before parsing ", activities);
   activities = parsedActivities;
   console.log(parsedActivities);

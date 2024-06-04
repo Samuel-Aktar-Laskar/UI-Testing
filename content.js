@@ -39,7 +39,8 @@ function recordClick(event) {
     type: addingAssert ? "assert":"click",
     x: event.clientX,
     y: event.clientY,
-    xPath:getXPath(element)
+    xPath:getXPath(element),
+    boundingRect: element.getBoundingClientRect()
   };
   addingAssert = false
 
@@ -208,11 +209,13 @@ startAction()
 
 
 
-//utils functions
+// UTILS FUNCTIONS
 
 function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+
 
 
 // XPath Selector code
@@ -289,7 +292,8 @@ function injectPipWindow(){
 
     // Add event listeners for the buttons
  
-    document.getElementById('button2').addEventListener('click', () => {
+    document.getElementById('button2').addEventListener('click',async () => {
+      await wait(100)
       addingAssert = true
     });
 
