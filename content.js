@@ -47,6 +47,7 @@ function recordClick(event) {
         y: event.clientY,
         xPath: getXPath(element),
         boundingRect: element.getBoundingClientRect(),
+        otherProperties:getLeafNodeProperties(element)
     };
     addingAssert = false;
 
@@ -217,6 +218,45 @@ startAction();
 function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+function getLeafNodeProperties(element) {
+  const properties = {
+    type: element.tagName.toLowerCase()
+  };
+
+  const type = properties.type;
+  switch (type) {
+    case 'img':
+      properties.imageUrl = element.src;
+      break;
+    case 'a': // anchor tag
+      if (element.hasAttribute('href')) {
+        properties.anchorHref = element.href;
+      }
+      break;
+    case 'button':
+      properties.buttonText = element.textContent.trim();
+      break;
+    case 'p':
+      properties.textContent = element.textContent.trim();
+      break;
+    case 'span':
+      properties.textContent = element.textContent.trim();
+      break;
+    case 'input':
+      properties.inputType = element.type;  // Input type (text, password, etc.)
+      if (element.hasAttribute('placeholder')) {
+        properties.placeholder = element.placeholder;
+      }
+      break;
+    case 'textarea':
+      properties.textContent = element.value.trim();  // Use value for textarea
+      break;
+    // Add more cases for other leaf node types (if needed)
+  }
+  return properties;
+}
+
 
 // XPath Selector code
 function getXPath(element) {
