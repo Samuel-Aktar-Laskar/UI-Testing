@@ -27,8 +27,14 @@ async function startReplay(){
 }
 
 async function continuePlay(){
-    curIndex += 1
-    const isComplete = curIndex >= activities.length
+  let isComplete = false
+    while(true){
+      curIndex += 1
+      isComplete = curIndex >= activities.length
+      if (isComplete) break
+      if (activities.at(curIndex).type === 'network') continue
+      else break
+    }
     if (isComplete) curIndex = -1
     await wait(1000)
     console.log("Continue play, curIndex ", curIndex, " isComplete ", isComplete, " activities length ", activities.length)

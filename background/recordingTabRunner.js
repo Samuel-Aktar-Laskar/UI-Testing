@@ -80,21 +80,30 @@ function closeTab(tabId) {
 
 function filterData() {
   const parsedActivities = [];
+  let lastNonNetowrk = null
 
   for(let i=0;i<activities.length;i++){
     const activity = activities[i]
-    if (activity.type == 'scroll')
+    const lastNonNetowrkCache = JSON.parse(JSON.stringify(lastNonNetowrk))
+    if (activity.type != 'network')
+      lastNonNetowrk = activity 
+    if (activity.type === 'scroll')
       continue
 
-    if (i>0 && activities[i-1].type == 'scroll'){
-      parsedActivities.push(activities[i-1])
+    if (activity.type === 'network'){
+      parsedActivities.push(activity)
+      continue
+    }
+
+    if (lastNonNetowrkCache && lastNonNetowrkCache.type == 'scroll'){
+      parsedActivities.push(lastNonNetowrkCache)
     }
 
     if (activity.type == 'typing') 
       continue
 
-    if (i>0 && activities[i-1].type == 'typing'){
-      parsedActivities.push(activities[i-1])
+    if (lastNonNetowrkCache && lastNonNetowrkCache.type == 'typing'){
+      parsedActivities.push(lastNonNetowrkCache)
     }
 
     if ('xPath' in activity && activity.xPath === "//*[@id='button2']") continue
