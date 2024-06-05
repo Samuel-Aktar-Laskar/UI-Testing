@@ -15,19 +15,20 @@ async function captureBoundingRect(boundingRect) {
                 let image = new Image();
                 image.onload = function () {
                     let canvas = document.createElement("canvas");
-                    canvas.width = boundingRect.width;
-                    canvas.height = boundingRect.height;
+                    const factor = 1.25
+                    canvas.width = factor*boundingRect.width;
+                    canvas.height = factor*boundingRect.height;
                     let context = canvas.getContext("2d");
                     context.drawImage(
                         image,
-                        boundingRect.left,
-                        boundingRect.top,
-                        boundingRect.width,
-                        boundingRect.height,
+                        factor*boundingRect.left ,
+                        factor*boundingRect.top,
+                        factor*boundingRect.width,
+                        factor*boundingRect.height,
                         0,
                         0,
-                        boundingRect.width,
-                        boundingRect.height
+                        factor*boundingRect.width,
+                        factor*boundingRect.height
                     );
                     let croppedDataUrl = canvas.toDataURL("image/png");
                     console.log("Screenshot is :", croppedDataUrl);
